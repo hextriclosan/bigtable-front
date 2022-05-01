@@ -1,0 +1,9 @@
+---
+
+cf:
+  string_data:
+    type: String
+  int_data:
+    type: JavaInteger
+  long_data:
+    type: JavaLong

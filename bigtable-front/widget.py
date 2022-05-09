@@ -89,13 +89,31 @@ class Widget(QWidget):
             QMessageBox.warning(self, "", "Error occurred: {}".format(str(e)))
 
     def write_data_click(self):
+        project_id = self.project_id.text()
+        instance_id = self.instance_id.text()
+        table_id = self.table_id.text()
+        row_key = self.row_key.text()
         try:
-            data = self.model.get_formatted_data_to_store()
-            if data:
-                project_id = self.project_id.text()
-                instance_id = self.instance_id.text()
-                table_id = self.table_id.text()
-                row_key = self.row_key.text()
-                write_formatted_data(project_id, instance_id, table_id, (row_key, data))
+            formatted_data = (row_key, self.model.get_formatted_data_to_store())
+            if not self.confirm_save(formatted_data):
+                return
+
+            write_formatted_data(project_id, instance_id, table_id, formatted_data)
         except Exception as e:
             QMessageBox.warning(self, "", "Error occurred: {}".format(str(e)))
+
+    def confirm_save(self, formatted_data):
+        text = "Save data to {}:<pre>{{}}</pre>".format(self.table_id.text())
+        text_data = "row_key={}\n".format(formatted_data[0])
+        for cf_name, cf in formatted_data[1].items():
+            for key, value in cf.items():
+                text_data += "  {}:{}={}\n".format(cf_name, key, str(value))
+
+        msg = QMessageBox(self)
+        msg.setStandardButtons(QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard)
+        msg.setDefaultButton(QMessageBox.StandardButton.Discard)
+        msg.setIcon(QMessageBox.Icon.Question)
+        msg.setWindowTitle("Confirm save")
+        msg.setText(text.format(text_data))
+
+        return QMessageBox.StandardButton.Save == msg.exec()

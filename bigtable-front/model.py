@@ -87,7 +87,7 @@ class Model(QAbstractTableModel):
                     else:
                         self.data.append([cf_name, column_name, '', ''])
             else:
-                for column_name in cf.items():
+                for column_name, _ in cf.items():
                     self.data.append([cf_name, column_name, '', ''])
 
         self.layoutChanged.emit()

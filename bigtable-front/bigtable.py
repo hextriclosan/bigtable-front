@@ -19,7 +19,9 @@ def write_formatted_data(project_id, instance_id, table_id, formatted_data):
         for column_name, value in cf.items():
             row.set_cell(cf_name, column_name, value)
 
-    row.commit()
+    status = row.commit()
+    if status.code != 0:
+        raise IOError(status.message)
 
 
 def get_table(project_id, instance_id, table_id):
